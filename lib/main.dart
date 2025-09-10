@@ -1,122 +1,244 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_html/flutter_html.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
-void main() {
-  runApp(const MyApp());
+/// Elimina etiquetas HTML simples para mostrar títulos o resúmenes
+String stripHtml(String? html) {
+  if (html == null) return '';
+  return html
+      .replaceAll(RegExp(r'<[^>]*>', multiLine: true, caseSensitive: false), '')
+      .replaceAll('&nbsp;', ' ')
+      .trim();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+void main() {
+  runApp(MyApp());
+}
 
-  // This widget is the root of your application.
+const String siteBase = 'https://www.jovenescristianos.co';
+const String postsEndpoint = '$siteBase/wp-json/wp/v2/posts';
+
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'Jóvenes Cristianos',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      debugShowCheckedModeBanner: false,
+      home: SplashScreen(), // Mostramos el Splash primero
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+/// --- SPLASH SCREEN ---
+class SplashScreen extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Esperamos 3 segundos antes de pasar a HomeChooser
+    Timer(const Duration(seconds: 3), () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => HomeChooser()),
+      );
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
+      backgroundColor: Colors.white, // Fondo blanco o azul según tu diseño
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          children: [
+            // Logo de Jóvenes Cristianos
+            Image.asset(
+              "assets/logo.png", // asegúrate de tener este archivo en assets
+              width: 180,
             ),
+            const SizedBox(height: 30),
+            const CircularProgressIndicator(color: Colors.blue),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+/// --- CHEQUEA DISPONIBILIDAD API ---
+class HomeChooser extends StatefulWidget {
+  @override
+  _HomeChooserState createState() => _HomeChooserState();
+}
+
+class _HomeChooserState extends State<HomeChooser> {
+  Future<bool>? _apiAvailable;
+
+  @override
+  void initState() {
+    super.initState();
+    _apiAvailable = _checkApi();
+  }
+
+  Future<bool> _checkApi() async {
+    try {
+      final resp = await http.get(Uri.parse('$postsEndpoint?per_page=1'));
+      if (resp.statusCode == 200) return true;
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _apiAvailable,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final apiOn = snap.data ?? false;
+        return MainTabs(apiAvailable: apiOn);
+      },
+    );
+  }
+}
+
+/// --- PESTAÑAS PRINCIPALES ---
+class MainTabs extends StatefulWidget {
+  final bool apiAvailable;
+  MainTabs({required this.apiAvailable});
+
+  @override
+  _MainTabsState createState() => _MainTabsState();
+}
+
+class _MainTabsState extends State<MainTabs> {
+  int _index = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final tabs = <Widget>[
+      widget.apiAvailable ? PostsPage() : WebSitePage(),
+      WebSitePage(),
+    ];
+
+    return Scaffold(
+      body: tabs[_index],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _index,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.article), label: "Noticias"),
+          BottomNavigationBarItem(icon: Icon(Icons.web), label: "Web"),
+        ],
+        onTap: (i) => setState(() => _index = i),
+      ),
+    );
+  }
+}
+
+/// --- EJEMPLO DE PÁGINA WEBVIEW ---
+class WebSitePage extends StatelessWidget {
+  const WebSitePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(Uri.parse(siteBase));
+
+    return Scaffold(
+      body: WebViewWidget(controller: controller),
+    );
+  }
+}
+
+/// --- EJEMPLO DE POSTS ---
+class PostsPage extends StatelessWidget {
+  const PostsPage({Key? key}) : super(key: key);
+
+  Future<List<dynamic>> _fetchPosts() async {
+    final resp = await http.get(Uri.parse('$postsEndpoint?per_page=10'));
+    if (resp.statusCode == 200) {
+      return json.decode(resp.body);
+    } else {
+      throw Exception("Error al cargar posts");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<dynamic>>(
+      future: _fetchPosts(),
+      builder: (context, snap) {
+        if (!snap.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final posts = snap.data!;
+        return ListView.builder(
+          itemCount: posts.length,
+          itemBuilder: (context, i) {
+            final title = stripHtml(posts[i]["title"]["rendered"]);
+            final excerpt = stripHtml(posts[i]["excerpt"]["rendered"]);
+            final imageUrl = posts[i]["jetpack_featured_media_url"] ?? "";
+
+            return ListTile(
+              leading: imageUrl.isNotEmpty
+                  ? CachedNetworkImage(
+                imageUrl: imageUrl,
+                width: 60,
+                placeholder: (c, _) =>
+                const CircularProgressIndicator(strokeWidth: 2),
+                errorWidget: (c, _, __) => const Icon(Icons.image),
+              )
+                  : const Icon(Icons.article),
+              title: Text(title),
+              subtitle: Text(
+                excerpt,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => PostDetailPage(
+                    title: title,
+                    content: posts[i]["content"]["rendered"],
+                  ),
+                ));
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+/// --- DETALLE DE POST ---
+class PostDetailPage extends StatelessWidget {
+  final String title;
+  final String content;
+
+  const PostDetailPage({Key? key, required this.title, required this.content})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: SingleChildScrollView(child: Html(data: content)),
     );
   }
 }
