@@ -19,10 +19,13 @@ String stripHtml(String? html) {
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // 👇 Configuración de la barra superior (hora, señal, batería)
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.white, // Fondo blanco
-    statusBarIconBrightness: Brightness.dark, // Iconos oscuros (hora, batería, señal)
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.white, // Fondo blanco
+      statusBarIconBrightness:
+          Brightness.dark, // Iconos oscuros (hora, batería, señal)
+    ),
+  );
 
   runApp(MyApp());
 }
@@ -54,9 +57,9 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // Esperamos 3 segundos antes de pasar a HomeChooser
     Timer(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomeChooser()),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => HomeChooser()));
     });
   }
 
@@ -113,9 +116,7 @@ class _HomeChooserState extends State<HomeChooser> {
       future: _apiAvailable,
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          return Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
         }
         final apiOn = snap.data ?? false;
         return MainTabs(apiAvailable: apiOn);
@@ -145,14 +146,14 @@ class _MainTabsState extends State<MainTabs> {
 
     return Scaffold(
       body: tabs[_index],
-      bottomNavigationBar: BottomNavigationBar(
+      /*bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.article), label: "Noticias"),
           BottomNavigationBarItem(icon: Icon(Icons.web), label: "Web"),
         ],
         onTap: (i) => setState(() => _index = i),
-      ),
+      ),*/
     );
   }
 }
@@ -168,9 +169,10 @@ class WebSitePage extends StatelessWidget {
       ..loadRequest(Uri.parse(siteBase));
 
     return Scaffold(
-        body: SafeArea( // 👈 Esto evita que el WebView tape la hora/señal/batería
+      body: SafeArea(
+        // 👈 Esto evita que el WebView tape la hora/señal/batería
         child: WebViewWidget(controller: controller),
-        ),
+      ),
     );
   }
 }
@@ -207,12 +209,12 @@ class PostsPage extends StatelessWidget {
             return ListTile(
               leading: imageUrl.isNotEmpty
                   ? CachedNetworkImage(
-                imageUrl: imageUrl,
-                width: 60,
-                placeholder: (c, _) =>
-                const CircularProgressIndicator(strokeWidth: 2),
-                errorWidget: (c, _, __) => const Icon(Icons.image),
-              )
+                      imageUrl: imageUrl,
+                      width: 60,
+                      placeholder: (c, _) =>
+                          const CircularProgressIndicator(strokeWidth: 2),
+                      errorWidget: (c, _, __) => const Icon(Icons.image),
+                    )
                   : const Icon(Icons.article),
               title: Text(title),
               subtitle: Text(
@@ -221,12 +223,14 @@ class PostsPage extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => PostDetailPage(
-                    title: title,
-                    content: posts[i]["content"]["rendered"],
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => PostDetailPage(
+                      title: title,
+                      content: posts[i]["content"]["rendered"],
+                    ),
                   ),
-                ));
+                );
               },
             );
           },
@@ -242,16 +246,16 @@ class PostDetailPage extends StatelessWidget {
   final String content;
 
   const PostDetailPage({Key? key, required this.title, required this.content})
-      : super(key: key);
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        backgroundColor: Colors.white,   // 👈 Fondo blanco
-        foregroundColor: Colors.black,   // 👈 Texto e íconos en negro
-        elevation: 1,                     // 👈 Borde sutil abajo
+        backgroundColor: Colors.white, // 👈 Fondo blanco
+        foregroundColor: Colors.black, // 👈 Texto e íconos en negro
+        elevation: 1, // 👈 Borde sutil abajo
       ),
       body: SingleChildScrollView(child: Html(data: content)),
     );
