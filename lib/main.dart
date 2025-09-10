@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_html/flutter_html.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/services.dart';
 
 /// Elimina etiquetas HTML simples para mostrar títulos o resúmenes
 String stripHtml(String? html) {
@@ -16,6 +17,13 @@ String stripHtml(String? html) {
 }
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  // 👇 Configuración de la barra superior (hora, señal, batería)
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.white, // Fondo blanco
+    statusBarIconBrightness: Brightness.dark, // Iconos oscuros (hora, batería, señal)
+  ));
+
   runApp(MyApp());
 }
 
@@ -160,7 +168,9 @@ class WebSitePage extends StatelessWidget {
       ..loadRequest(Uri.parse(siteBase));
 
     return Scaffold(
-      body: WebViewWidget(controller: controller),
+        body: SafeArea( // 👈 Esto evita que el WebView tape la hora/señal/batería
+        child: WebViewWidget(controller: controller),
+        ),
     );
   }
 }
@@ -237,7 +247,12 @@ class PostDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(title),
+        backgroundColor: Colors.white,   // 👈 Fondo blanco
+        foregroundColor: Colors.black,   // 👈 Texto e íconos en negro
+        elevation: 1,                     // 👈 Borde sutil abajo
+      ),
       body: SingleChildScrollView(child: Html(data: content)),
     );
   }
