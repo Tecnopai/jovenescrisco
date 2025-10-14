@@ -1,4 +1,4 @@
-package com.miltonbass.jovenescrisco.jovenescrisco;
+package com.miltonbass.jovenescrisco;
 
 import io.flutter.embedding.android.FlutterActivity;
 
