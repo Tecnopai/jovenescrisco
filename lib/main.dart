@@ -27,28 +27,32 @@ void main() {
     ),
   );
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 const String siteBase = 'https://www.jovenescristianos.co';
 const String postsEndpoint = '$siteBase/wp-json/wp/v2/posts';
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Jóvenes Cristianos',
       theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(), // Mostramos el Splash primero
+      home: const SplashScreen(), // Mostramos el Splash primero
     );
   }
 }
 
 /// --- SPLASH SCREEN ---
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
@@ -59,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(const Duration(seconds: 3), () {
       Navigator.of(
         context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => HomeChooser()));
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeChooser()));
     });
   }
 
@@ -87,8 +91,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
 /// --- CHEQUEA DISPONIBILIDAD API ---
 class HomeChooser extends StatefulWidget {
+  const HomeChooser({super.key});
+
   @override
-  _HomeChooserState createState() => _HomeChooserState();
+  State<HomeChooser> createState() => _HomeChooserState();
 }
 
 class _HomeChooserState extends State<HomeChooser> {
@@ -116,7 +122,9 @@ class _HomeChooserState extends State<HomeChooser> {
       future: _apiAvailable,
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          return Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
         final apiOn = snap.data ?? false;
         return MainTabs(apiAvailable: apiOn);
@@ -128,20 +136,20 @@ class _HomeChooserState extends State<HomeChooser> {
 /// --- PESTAÑAS PRINCIPALES ---
 class MainTabs extends StatefulWidget {
   final bool apiAvailable;
-  MainTabs({required this.apiAvailable});
+  const MainTabs({super.key, required this.apiAvailable});
 
   @override
-  _MainTabsState createState() => _MainTabsState();
+  State<MainTabs> createState() => _MainTabsState();
 }
 
 class _MainTabsState extends State<MainTabs> {
-  int _index = 0;
+  final int _index = 0;
 
   @override
   Widget build(BuildContext context) {
     final tabs = <Widget>[
-      widget.apiAvailable ? PostsPage() : WebSitePage(),
-      WebSitePage(),
+      widget.apiAvailable ? const PostsPage() : const WebSitePage(),
+      const WebSitePage(),
     ];
 
     return Scaffold(
@@ -160,7 +168,7 @@ class _MainTabsState extends State<MainTabs> {
 
 /// --- EJEMPLO DE PÁGINA WEBVIEW ---
 class WebSitePage extends StatelessWidget {
-  const WebSitePage({Key? key}) : super(key: key);
+  const WebSitePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +187,7 @@ class WebSitePage extends StatelessWidget {
 
 /// --- EJEMPLO DE POSTS ---
 class PostsPage extends StatelessWidget {
-  const PostsPage({Key? key}) : super(key: key);
+  const PostsPage({super.key});
 
   Future<List<dynamic>> _fetchPosts() async {
     final resp = await http.get(Uri.parse('$postsEndpoint?per_page=10'));
@@ -213,7 +221,7 @@ class PostsPage extends StatelessWidget {
                       width: 60,
                       placeholder: (c, _) =>
                           const CircularProgressIndicator(strokeWidth: 2),
-                      errorWidget: (c, _, __) => const Icon(Icons.image),
+                      errorWidget: (c, _, _) => const Icon(Icons.image),
                     )
                   : const Icon(Icons.article),
               title: Text(title),
@@ -245,8 +253,7 @@ class PostDetailPage extends StatelessWidget {
   final String title;
   final String content;
 
-  const PostDetailPage({Key? key, required this.title, required this.content})
-    : super(key: key);
+  const PostDetailPage({super.key, required this.title, required this.content});
 
   @override
   Widget build(BuildContext context) {
