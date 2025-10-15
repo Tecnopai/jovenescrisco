@@ -7,7 +7,6 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Cargar propiedades del keystore de forma segura
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
 if (keystorePropertiesFile.exists()) {
@@ -17,23 +16,23 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.miltonbass.jovenescrisco"
     compileSdk = 36
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "27.2.12479018"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     defaultConfig {
         applicationId = "com.miltonbass.jovenescrisco"
-        minSdk = flutter.minSdkVersion
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        minSdk = 24
+        targetSdk = 35
+        versionCode = 4
+        versionName = "1.1.4"
         
         multiDexEnabled = true
     }
@@ -41,7 +40,7 @@ android {
     signingConfigs {
         create("release") {
             if (keystorePropertiesFile.exists()) {
-                storeFile = file(keystoreProperties.getProperty("storeFile") ?: "jovenescrisco.keystore")
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
                 storePassword = keystoreProperties.getProperty("storePassword")
                 keyAlias = keystoreProperties.getProperty("keyAlias")
                 keyPassword = keystoreProperties.getProperty("keyPassword")
@@ -62,6 +61,7 @@ android {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
             isDebuggable = true
+            applicationIdSuffix = ".debug"
         }
     }
 
@@ -75,9 +75,14 @@ android {
                 "META-INF/NOTICE",
                 "META-INF/NOTICE.txt",
                 "META-INF/notice.txt",
-                "META-INF/ASL2.0"
+                "META-INF/ASL2.0",
+                "META-INF/*.kotlin_module"
             )
         }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -86,6 +91,5 @@ flutter {
 }
 
 dependencies {
-    // Desugaring para compatibilidad con APIs modernas en versiones antiguas de Android
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

@@ -119,3 +119,5 @@ app.*.symbols
 !/dev/ci/**/Gemfile.lock
 .idea/libraries/Dart_Packages.xml
 android/app/keystore.properties
+android/.kotlin/sessions/kotlin-compiler-17865926062545994848.salive
+android/keystore.properties
