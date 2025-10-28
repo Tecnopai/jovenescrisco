@@ -1,8 +1,41 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Permisos mínimos -->
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- ================================================================== -->
+    <!-- PERMISOS REQUERIDOS POR LA APLICACIÓN -->
+    <!-- ================================================================== -->
+    
+    <!-- Permiso básico de internet para el streaming y las peticiones HTTP. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Verificar estado de la red para detectar desconexiones y gestionar reconexiones. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- Verificar estado del WiFi (puede ser útil para decisiones de streaming). -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    
+    <!-- Mantener la CPU activa durante reproducción (evita que el sistema duerma la aplicación
+         y corte el audio). Es el permiso nativo para el Wake Lock de MainActivity.kt. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    
+    <!-- Reproducción en background (cuando la app está minimizada), requerido por just_audio/radio_player. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    
+    <!-- Tipo específico de servicio en foreground para Android 14 (API 34) y superiores. 
+         Es obligatorio declarar el tipo si se usa FOREGROUND_SERVICE. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+    <!-- Permisos para controlar el volumen del sistema, utilizado por el paquete volume_controller. -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    
+    <!-- Para evitar que el modo Doze (ahorro de batería) detenga la app en segundo plano. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    
+    <!-- Para Android 12+ (API 31+): permite usar alarmas exactas, que pueden ser necesarias 
+         para programar temporizadores de apagado o reconexión precisa. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+
+    <!-- Permiso para acceder al identificador de publicidad (AD ID) en dispositivos con Google Play Services. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
 
     <application
         android:label="Jóvenes Cristianos"

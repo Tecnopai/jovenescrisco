@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "547235716767",
+    "project_id": "jovenes-cristiananos-colombia",
+    "storage_bucket": "jovenes-cristiananos-colombia.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547235716767:android:551e32fcfa7aa985590caa",
+        "android_client_info": {
+          "package_name": "com.miltonbass.jovenescrisco"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiyxdq5xADtg-QLOFpiNcXw73xY-oUuzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
