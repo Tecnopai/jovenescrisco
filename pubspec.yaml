@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.2.0+5
+version: 1.2.2+7
 
 environment:
   sdk: '>=3.8.1 <4.0.0'
@@ -60,21 +60,12 @@ dependencies:
   # --------------------------------------------------------------------------
   url_launcher: ^6.3.1             # Abre URLs externas (ej. sitio web, redes sociales).
   webview_flutter: ^4.4.0          # Muestra contenido web dentro de la aplicación.
-  share_plus: ^7.2.1               # Permite compartir contenido de la aplicación.
+  share_plus: ^12.0.1               # Permite compartir contenido de la aplicación.
   package_info_plus: ^9.0.0        # Obtiene la versión, nombre del paquete, etc., de forma automática.
   logger: ^2.0.0                   # Herramienta profesional para el registro de logs (reemplazando 'print').
 
-  # Iconos (ya incluido con Material, esto es para iconos al estilo iOS)
-  cupertino_icons: ^1.0.8 
-
   # Fuentes personalizadas de Google Fonts
   google_fonts: ^6.2.0
-
-flutter_launcher_icons:
-  android: true
-  ios: true
-  image_path: "assets/logo.png"
-  min_sdk_android: 21
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -83,6 +74,8 @@ flutter_launcher_icons:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.1
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -93,6 +86,12 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.png"
+  min_sdk_android: 21
 
 # The following section is specific to Flutter packages.
 flutter:

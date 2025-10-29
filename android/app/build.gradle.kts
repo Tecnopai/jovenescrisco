@@ -22,21 +22,20 @@ android {
     ndkVersion = "27.2.12479018"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
 
     defaultConfig {
         applicationId = "com.miltonbass.jovenescrisco"
         minSdk = 24
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.1.4"
-        
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
         multiDexEnabled = true
     }
 
@@ -104,4 +103,8 @@ dependencies {
 
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
+
+    // Edge-to-Edge para Android 15+
+    implementation("androidx.activity:activity:1.9.3")
+    implementation("androidx.core:core-ktx:1.15.0")
 }

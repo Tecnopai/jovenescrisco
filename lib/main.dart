@@ -37,8 +37,13 @@ void main() async {
         statusBarBrightness: Brightness.dark,
         // Color de los iconos de la barra de estado (claro/blanco).
         statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
+
+    // Habilitar edge-to-edge para Android 15+
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
     // Inicialización de Firebase (requerido para todos los servicios como Analytics y Remote Config).
     await Firebase.initializeApp(
