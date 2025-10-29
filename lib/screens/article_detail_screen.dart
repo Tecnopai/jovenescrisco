@@ -166,9 +166,9 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
   ) {
     // Lógica de UI para Automotive...
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF1E1B4B), // Reemplazo de Colors.black
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: const Color(0xFF1E1B4B), // Reemplazo de Colors.black
         title: Row(
           children: [
             Text(
@@ -198,7 +198,9 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           decoration: BoxDecoration(
-                            color: Colors.grey[900],
+                            color: const Color(
+                              0xFF1E1B4B,
+                            ), // Reemplazo de Colors.grey[900]
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
@@ -296,7 +298,8 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
+                          backgroundColor:
+                              AppColors.primary, // Reemplazo de Colors.green
                           foregroundColor: Colors.white,
                           minimumSize: const Size(double.infinity, 70),
                           padding: const EdgeInsets.symmetric(vertical: 20),
@@ -321,16 +324,23 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: const Color(0xFF1E1B4B), // Reemplazo de Colors.grey[900]
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green, width: 2),
+        border: Border.all(
+          color: AppColors.primary,
+          width: 2,
+        ), // Reemplazo de Colors.green
       ),
       child: Column(
         children: [
           // Encabezado
           Row(
             children: [
-              const Icon(Icons.headphones, color: Colors.green, size: 28),
+              Icon(
+                Icons.headphones,
+                color: AppColors.primary,
+                size: 28,
+              ), // Reemplazo de Colors.green
               const SizedBox(width: 12),
               Text(
                 'Audio del artículo',
@@ -349,9 +359,10 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
             children: [
               SliderTheme(
                 data: SliderThemeData(
-                  activeTrackColor: Colors.green,
+                  activeTrackColor:
+                      AppColors.primary, // Reemplazo de Colors.green
                   inactiveTrackColor: Colors.grey[700],
-                  thumbColor: Colors.green,
+                  thumbColor: AppColors.primary, // Reemplazo de Colors.green
                   thumbShape: const RoundSliderThumbShape(
                     enabledThumbRadius: 8,
                   ),
@@ -423,7 +434,7 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
                       height: 64,
                       padding: const EdgeInsets.all(16),
                       child: const CircularProgressIndicator(
-                        color: Colors.green,
+                        color: AppColors.primary, // Reemplazo de Colors.green
                         strokeWidth: 3,
                       ),
                     );
@@ -433,7 +444,7 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
                   return IconButton(
                     icon: Icon(
                       playing ? Icons.pause_circle : Icons.play_circle,
-                      color: Colors.green,
+                      color: AppColors.primary, // Reemplazo de Colors.green
                     ),
                     iconSize: 64,
                     onPressed: () {
@@ -1098,7 +1109,7 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
           borderRadius,
           'Compartir',
           Icons.share,
-          Colors.blue,
+          AppColors.secondary, // Reemplazo de Colors.blue
           () => _shareArticle(context),
         ),
       ],
@@ -1127,7 +1138,7 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
             borderRadius,
             'Compartir',
             Icons.share,
-            Colors.blue,
+            AppColors.secondary, // Reemplazo de Colors.blue
             () => _shareArticle(context),
           ),
         ),
@@ -1215,7 +1226,7 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
             ),
           ],
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.primary, // Reemplazo de Colors.green
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

@@ -67,6 +67,9 @@ dependencies:
   # Iconos (ya incluido con Material, esto es para iconos al estilo iOS)
   cupertino_icons: ^1.0.8 
 
+  # Fuentes personalizadas de Google Fonts
+  google_fonts: ^6.2.0
+
 flutter_launcher_icons:
   android: true
   ios: true

@@ -280,14 +280,22 @@ class Article {
   /// Extrae la URL de la imagen destacada (featured media) del artículo.
   static String? _extractImageUrl(Map<String, dynamic> json) {
     try {
+      debugPrint('🔍 Buscando imagen...');
+
       // 1. Obtener desde datos embebidos (_embed)
       if (json['_embedded'] != null) {
+        debugPrint('   ✓ Tiene _embedded');
         final embedded = json['_embedded'];
+
         if (embedded is Map<String, dynamic> &&
             embedded['wp:featuredmedia'] != null) {
+          debugPrint('   ✓ Tiene wp:featuredmedia');
           final featuredMedia = embedded['wp:featuredmedia'];
+
           if (featuredMedia is List && featuredMedia.isNotEmpty) {
+            debugPrint('   ✓ Lista no vacía');
             final media = featuredMedia[0];
+
             if (media is Map<String, dynamic>) {
               // Intentar obtener diferentes tamaños de imagen
               if (media['media_details'] != null) {
@@ -299,19 +307,28 @@ class Article {
                     // Priorizar tamaños: large > medium_large > medium > full
                     if (sizes['large'] != null &&
                         sizes['large']['source_url'] != null) {
-                      return sizes['large']['source_url'] as String?;
+                      final url = sizes['large']['source_url'] as String?;
+                      debugPrint('   ✅ IMAGEN ENCONTRADA (large): $url');
+                      return url;
                     }
                     if (sizes['medium_large'] != null &&
                         sizes['medium_large']['source_url'] != null) {
-                      return sizes['medium_large']['source_url'] as String?;
+                      final url =
+                          sizes['medium_large']['source_url'] as String?;
+                      debugPrint('   ✅ IMAGEN ENCONTRADA (medium_large): $url');
+                      return url;
                     }
                     if (sizes['medium'] != null &&
                         sizes['medium']['source_url'] != null) {
-                      return sizes['medium']['source_url'] as String?;
+                      final url = sizes['medium']['source_url'] as String?;
+                      debugPrint('   ✅ IMAGEN ENCONTRADA (medium): $url');
+                      return url;
                     }
                     if (sizes['full'] != null &&
                         sizes['full']['source_url'] != null) {
-                      return sizes['full']['source_url'] as String?;
+                      final url = sizes['full']['source_url'] as String?;
+                      debugPrint('   ✅ IMAGEN ENCONTRADA (full): $url');
+                      return url;
                     }
                   }
                 }
@@ -319,7 +336,9 @@ class Article {
 
               // Si no hay tamaños específicos, usar la URL original (source_url)
               if (media['source_url'] != null) {
-                return media['source_url'] as String?;
+                final url = media['source_url'] as String?;
+                debugPrint('   ✅ IMAGEN ENCONTRADA (source_url): $url');
+                return url;
               }
             }
           }
@@ -328,13 +347,16 @@ class Article {
 
       // 2. URL directa de Jetpack (si está disponible)
       if (json['jetpack_featured_media_url'] != null) {
-        return json['jetpack_featured_media_url'] as String;
+        final url = json['jetpack_featured_media_url'] as String;
+        debugPrint('   ✅ IMAGEN ENCONTRADA (jetpack): $url');
+        return url;
       }
 
+      // Solo llega aquí si no encontró nada
+      debugPrint('   ❌ NO se encontró imagen');
       return null;
     } catch (e) {
-      // Debug: imprime el error
-      debugPrint('❌ Error extrayendo imagen: $e');
+      debugPrint('   ❌ Error extrayendo imagen: $e');
       return null;
     }
   }

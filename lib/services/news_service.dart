@@ -4,6 +4,8 @@ import '../models/article.dart';
 import '../models/category.dart';
 import '../core/constants/app_constants.dart';
 
+import 'package:flutter/foundation.dart' show debugPrint;
+
 /// Servicio para obtener noticias desde la API REST de WordPress
 /// Maneja la comunicación con el servidor y el filtrado de contenido.
 class NewsService {
@@ -109,13 +111,32 @@ class NewsService {
       final uri = Uri.parse(
         '$_baseUrl/posts?page=$page&per_page=$_itemsPerPage&_embed',
       );
+
+      debugPrint('🌐 Solicitando: $uri');
+
       final response = await http.get(uri).timeout(_timeout);
+
+      debugPrint('📡 Status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
+
+        debugPrint('📰 Artículos recibidos: ${data.length}');
+
         final articles = data
             .map((item) => Article.fromJson(item as Map<String, dynamic>))
             .toList();
+
+        // Debug: Ver las primeras 3 imágenes
+        for (var i = 0; i < (articles.length > 3 ? 3 : articles.length); i++) {
+          debugPrint('📄 Artículo ${i + 1}: ${articles[i].title}');
+          debugPrint(
+            '   🖼️ Imagen: ${articles[i].imageUrl ?? "❌ SIN IMAGEN"}',
+          );
+        }
+
+        final filtered = _filterByAllowedCategories(articles);
+        debugPrint('✅ Artículos después del filtro: ${filtered.length}');
 
         // Aplicar el filtro de categorías permitidas
         return _filterByAllowedCategories(articles);
@@ -126,6 +147,7 @@ class NewsService {
         throw Exception('Error al cargar artículos: ${response.statusCode}');
       }
     } catch (e) {
+      debugPrint('❌ Error completo: $e');
       throw Exception('Error al conectar con el servidor: $e');
     }
   }

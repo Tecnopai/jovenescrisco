@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart'; // Añadir esta importación
+import 'package:package_info_plus/package_info_plus.dart';
 import '../core/theme/app_colors.dart';
 import '../utils/responsive_helper.dart';
 import 'main_screen.dart';
 
-/// Pantalla de bienvenida con animaciones
-/// Muestra el logo, nombre de la emisora, versión y un indicador de carga
-/// Se presenta al iniciar la aplicación antes de navegar a la pantalla principal
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -16,49 +13,35 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-  // Controladores de animación
   late AnimationController _logoController;
   late AnimationController _pulseController;
   late AnimationController _fadeController;
 
-  // Animaciones
   late Animation<double> _logoScale;
   late Animation<double> _logoOpacity;
   late Animation<double> _pulseScale;
   late Animation<double> _fadeAnimation;
 
-  // Variable para almacenar la versión
   String _version = 'Cargando...';
 
   @override
   void initState() {
     super.initState();
     _initializeAnimations();
-    _loadVersion(); // Cargar la versión
+    _loadVersion();
     _startSplashSequence();
   }
 
-  /// Carga la versión de la aplicación
   Future<void> _loadVersion() async {
     try {
       final packageInfo = await PackageInfo.fromPlatform();
-      if (mounted) {
-        setState(() {
-          _version = packageInfo.version;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _version = '1.0.0'; // Versión por defecto en caso de error
-        });
-      }
+      if (mounted) setState(() => _version = packageInfo.version);
+    } catch (_) {
+      if (mounted) setState(() => _version = '1.0.0');
     }
   }
 
-  /// Inicializa todas las animaciones de la pantalla splash
   void _initializeAnimations() {
-    // Animación del logo (escala y opacidad)
     _logoController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
@@ -75,7 +58,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // Animación de pulso continuo
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -85,7 +67,6 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
-    // Animación de fade out final
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
@@ -97,32 +78,19 @@ class _SplashScreenState extends State<SplashScreen>
     ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeOut));
   }
 
-  /// Ejecuta la secuencia de animaciones del splash
-  /// Espera 2 segundos antes de navegar a la pantalla principal
   Future<void> _startSplashSequence() async {
-    // Iniciar animación del logo
     await _logoController.forward();
-
-    // Esperar un momento
     await Future.delayed(const Duration(milliseconds: 300));
-
-    // Iniciar pulso continuo
     _pulseController.repeat(reverse: true);
-
-    // Simular carga de la aplicación (mínimo 2 segundos)
     await Future.delayed(const Duration(seconds: 2));
-
-    // Fade out y navegar
     await _fadeController.forward();
 
     if (mounted) {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const MainScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
+          pageBuilder: (context, animation, _) => const MainScreen(),
+          transitionsBuilder: (context, animation, _, child) =>
+              FadeTransition(opacity: animation, child: child),
           transitionDuration: const Duration(milliseconds: 300),
         ),
       );
@@ -141,7 +109,6 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     final responsive = ResponsiveHelper(context);
 
-    // Tamaños responsivos usando ResponsiveHelper
     final logoSize = responsive.getValue(
       smallPhone: 100.0,
       phone: 120.0,
@@ -169,7 +136,6 @@ class _SplashScreenState extends State<SplashScreen>
       automotive: 18.0,
     );
 
-    // Tamaño de fuente para la versión (más pequeño que el subtítulo)
     final versionFontSize = responsive.getValue(
       smallPhone: 12.0,
       phone: 13.0,
@@ -205,14 +171,12 @@ class _SplashScreenState extends State<SplashScreen>
       automotive: 16.0,
     );
 
-    // Espaciados adaptativos
     final spacing1 = responsive.spacing(32);
     final spacing2 = responsive.spacing(10);
-    final spacingVersion = responsive.spacing(4); // Espaciado para la versión
+    final spacingVersion = responsive.spacing(4);
     final spacing3 = responsive.spacing(16);
     final spacing4 = responsive.spacing(40);
 
-    // Blur radius para sombras
     final blurRadius = responsive.getValue(
       phone: 20.0,
       tablet: 30.0,
@@ -237,7 +201,7 @@ class _SplashScreenState extends State<SplashScreen>
               width: double.infinity,
               height: double.infinity,
               decoration: const BoxDecoration(
-                gradient: AppColors.primaryGradient,
+                gradient: AppColors.primaryGradient, // ✅ Usa gradiente de marca
               ),
               child: SafeArea(
                 child: Column(
@@ -245,7 +209,7 @@ class _SplashScreenState extends State<SplashScreen>
                   children: [
                     const Spacer(flex: 2),
 
-                    // Logo animado con efecto de escala y pulso
+                    /// 🔴 LOGO ANIMADO
                     AnimatedBuilder(
                       animation: Listenable.merge([
                         _logoController,
@@ -261,21 +225,18 @@ class _SplashScreenState extends State<SplashScreen>
                               height: logoSize,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: const RadialGradient(
+                                gradient: RadialGradient(
                                   colors: [
-                                    Color.fromARGB(31, 136, 137, 239),
-                                    Color.fromARGB(31, 138, 92, 246),
-                                    Color.fromARGB(31, 124, 104, 238),
+                                    AppColors.primary.withValues(alpha: 0.25),
+                                    AppColors.secondary.withValues(alpha: 0.15),
+                                    AppColors.secondary.withValues(alpha: 0.10),
                                   ],
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color.fromARGB(
-                                      104,
-                                      200,
-                                      201,
-                                      242,
-                                    ).withValues(alpha: 0.1),
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.2,
+                                    ),
                                     blurRadius: blurRadius,
                                     spreadRadius: spreadRadius,
                                   ),
@@ -304,14 +265,14 @@ class _SplashScreenState extends State<SplashScreen>
 
                     SizedBox(height: spacing1),
 
-                    // Título de la emisora con animación de opacidad
+                    /// 🔴 TÍTULO
                     AnimatedBuilder(
                       animation: _logoOpacity,
                       builder: (context, child) {
                         return Opacity(
                           opacity: _logoOpacity.value,
                           child: Text(
-                            'Jovenes Cristianos',
+                            'Jóvenes Cristianos',
                             style: TextStyle(
                               fontSize: titleFontSize,
                               fontWeight: FontWeight.bold,
@@ -325,7 +286,7 @@ class _SplashScreenState extends State<SplashScreen>
 
                     SizedBox(height: spacing2),
 
-                    // Frecuencia de la emisora
+                    /// 🔴 SUBTÍTULO
                     AnimatedBuilder(
                       animation: _logoOpacity,
                       builder: (context, child) {
@@ -343,8 +304,9 @@ class _SplashScreenState extends State<SplashScreen>
                       },
                     ),
 
-                    // Versión de la aplicación
                     SizedBox(height: spacingVersion),
+
+                    /// 🔴 VERSIÓN
                     AnimatedBuilder(
                       animation: _logoOpacity,
                       builder: (context, child) {
@@ -355,7 +317,6 @@ class _SplashScreenState extends State<SplashScreen>
                             style: TextStyle(
                               fontSize: versionFontSize,
                               color: AppColors.textMuted,
-                              letterSpacing: 1.0,
                             ),
                           ),
                         );
@@ -364,7 +325,7 @@ class _SplashScreenState extends State<SplashScreen>
 
                     const Spacer(),
 
-                    // Indicador de carga circular
+                    /// 🔴 INDICADOR DE CARGA
                     AnimatedBuilder(
                       animation: _logoOpacity,
                       builder: (context, child) {

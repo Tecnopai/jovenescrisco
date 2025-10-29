@@ -5,6 +5,8 @@ import '../models/category.dart';
 import '../core/theme/app_colors.dart';
 import 'article_detail_screen.dart';
 import '../utils/responsive_helper.dart';
+import '../widgets/cached_network_image_widget.dart';
+
 // Se omite la importación de 'news_list_screen.dart' ya que CategoryNewsScreen está en este archivo.
 
 /// Pantalla principal de noticias
@@ -486,36 +488,50 @@ class _NewsScreenState extends State<NewsScreen>
               // Mayor proporción de imagen en Grid
               flex: isGrid ? (isLandscape ? 7 : 6) : 0,
               child: article.imageUrl != null
-                  ? Image.network(
-                      article.imageUrl!,
-                      // Usa altura fija solo en modo lista (no Grid)
-                      height: isGrid ? null : imageHeight,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      // Indicador de carga
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
+                  ? Builder(
+                      builder: (context) {
+                        debugPrint('🖼️ ${article.title}');
+                        debugPrint('   ${article.imageUrl}');
+                        return CachedNetworkImageWidget(
+                          imageUrl: article.imageUrl!,
+                          // Usa altura fija solo en modo lista (no Grid)
                           height: isGrid ? null : imageHeight,
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.primary,
-                              strokeWidth: 2,
-                            ),
-                          ),
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          // Indicador de carga
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              height: isGrid ? null : imageHeight,
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.primary,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            );
+                          },
+                          // Placeholder de error
+                          errorBuilder: (context, error, stackTrace) {
+                            debugPrint('❌ $error');
+                            return Container(
+                              height: isGrid ? null : imageHeight,
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              child: Icon(
+                                Icons.image_not_supported,
+                                size: responsive.getValue(
+                                  phone: 40.0,
+                                  tablet: 48.0,
+                                ),
+                                color: AppColors.textSecondary.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
+                            );
+                          },
                         );
                       },
-                      // Placeholder de error
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        height: isGrid ? null : imageHeight,
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        child: Icon(
-                          Icons.image_not_supported,
-                          size: responsive.getValue(phone: 40.0, tablet: 48.0),
-                          color: AppColors.textSecondary.withValues(alpha: 0.5),
-                        ),
-                      ),
                     )
                   : Container(
                       // Placeholder si la URL es nula
@@ -713,8 +729,8 @@ class _NewsScreenState extends State<NewsScreen>
               ClipRRect(
                 borderRadius: BorderRadius.circular(borderRadius * 0.7),
                 child: category.imageUrl != null
-                    ? Image.network(
-                        category.imageUrl!,
+                    ? CachedNetworkImageWidget(
+                        imageUrl: category.imageUrl!,
                         width: imageSize,
                         height: imageSize,
                         fit: BoxFit.cover,
@@ -1066,8 +1082,8 @@ class _CategoryNewsScreenState extends State<CategoryNewsScreen> {
           children: [
             // Imagen del artículo con placeholders y builders
             if (article.imageUrl != null)
-              Image.network(
-                article.imageUrl!,
+              CachedNetworkImageWidget(
+                imageUrl: article.imageUrl!,
                 height: imageHeight,
                 width: double.infinity,
                 fit: BoxFit.cover,

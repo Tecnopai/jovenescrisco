@@ -9,11 +9,6 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import '../core/theme/app_colors.dart';
 import '../utils/responsive_helper.dart';
 
-/// Pantalla "Acerca de" que muestra información sobre la aplicación y la emisora.
-///
-/// Incluye logo, descripción, versión, enlaces web y soporte,
-/// extrayendo dinámicamente el contenido de la página 'Sobre Nosotros'
-/// mediante web scraping.
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
 
@@ -49,7 +44,7 @@ class _AboutScreenState extends State<AboutScreen> {
   Future<void> _loadAboutContent() async {
     try {
       final response = await http
-          .get(Uri.parse('https://ambientestereo.fm/sitio/sobre-nosotros/'))
+          .get(Uri.parse('https://jovenescristianos.co/quienes-somos/'))
           .timeout(const Duration(seconds: 10));
 
       if (!mounted) return;
@@ -127,7 +122,7 @@ class _AboutScreenState extends State<AboutScreen> {
       setState(() {
         _aboutContent = [
           Text(
-            'Nuestro propósito es promover la protección y conservación del medio ambiente, la participación ciudadana y los valores familiares y sociales a través de una programación variada, educativa y cristocéntrica.',
+            'Nos caracterizamos por tener un corazón apasionado por la juventud y sus propósitos en esta tierra; creemos en la unidad del cuerpo de Cristo, es por eso que esta plataforma no solo hace difusión de eventos, noticias, lanzamientos y demás, sino que agrupa a un concilio de iglesias que bajo la sana doctrina propagan el evangelio de Dios.',
             style: TextStyle(
               fontSize: responsive.bodyText,
               color: AppColors.textMuted,
@@ -207,24 +202,14 @@ class _AboutScreenState extends State<AboutScreen> {
             _buildLogo(responsive),
             SizedBox(height: responsive.spacing(32)),
             _buildTitle(responsive),
-            SizedBox(height: responsive.spacing(8)),
-            _buildSubtitle(responsive),
             SizedBox(height: responsive.spacing(32)),
             _buildDescriptionCard(responsive),
             SizedBox(height: responsive.spacing(24)),
             _buildInfoCard(responsive, 'Versión', _version),
             SizedBox(height: responsive.spacing(14)),
-            _buildInfoCard(
-              responsive,
-              'Emisora oficial de',
-              'La Iglesia Cristiana PAI',
-            ),
-            SizedBox(height: responsive.spacing(14)),
             _buildWebsiteButton(responsive),
             SizedBox(height: responsive.spacing(14)),
-            _buildWebsiteButton2(responsive),
-            SizedBox(height: responsive.spacing(14)),
-            _buildWebsiteButton1(responsive),
+            _buildSupportButton(responsive),
           ],
         ),
       ),
@@ -257,7 +242,7 @@ class _AboutScreenState extends State<AboutScreen> {
       ),
       child: ClipOval(
         child: Image.asset(
-          'assets/images/ambiente_logo.png',
+          'assets/logo.png',
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) =>
               const Icon(Icons.radio, color: AppColors.textPrimary),
@@ -267,18 +252,12 @@ class _AboutScreenState extends State<AboutScreen> {
   }
 
   Widget _buildTitle(ResponsiveHelper responsive) => Text(
-    'Ambiente Stereo 88.4 FM',
+    'Jóvenes Cristianos Colombia',
     style: TextStyle(
       fontSize: responsive.h1,
       fontWeight: FontWeight.bold,
       color: AppColors.textPrimary,
     ),
-    textAlign: TextAlign.center,
-  );
-
-  Widget _buildSubtitle(ResponsiveHelper responsive) => Text(
-    'La radio que sí quieres',
-    style: TextStyle(fontSize: responsive.h3, color: AppColors.textMuted),
     textAlign: TextAlign.center,
   );
 
@@ -346,24 +325,17 @@ class _AboutScreenState extends State<AboutScreen> {
 
   Widget _buildWebsiteButton(ResponsiveHelper responsive) => _buildButton(
     responsive,
-    'Web Ambiente Stereo',
+    'Sitio Web',
     Icons.web,
-    () => _launchUrl('https://ambientestereo.fm'),
+    () => _launchUrl('https://jovenescristianos.co/'),
   );
 
-  Widget _buildWebsiteButton2(ResponsiveHelper responsive) => _buildButton(
-    responsive,
-    'Web Iglesia Cristiana PAI',
-    Icons.web,
-    () => _launchUrl('https://iglesiacristianapai.org/'),
-  );
-
-  Widget _buildWebsiteButton1(ResponsiveHelper responsive) {
+  Widget _buildSupportButton(ResponsiveHelper responsive) {
     final emailUri = Uri(
       scheme: 'mailto',
-      path: 'tecnologia@iglesiacristianapai.org',
+      path: 'contacto@jovenescristianos.co',
       query:
-          'subject=${Uri.encodeComponent('Consulta desde la app Ambiente Stereo 88.4')}&body=${Uri.encodeComponent('Hola, quisiera más información sobre...')}',
+          'subject=${Uri.encodeComponent('Consulta desde la app Jóvenes Cristianos Colombia')}&body=${Uri.encodeComponent('Hola, quisiera más información sobre...')}',
     );
     return _buildButton(responsive, 'Soporte app', Icons.email, () async {
       if (await canLaunchUrl(emailUri)) await launchUrl(emailUri);

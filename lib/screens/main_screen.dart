@@ -3,14 +3,10 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'news_screen.dart';
 import 'about_screen.dart';
 import '../utils/responsive_helper.dart';
+import '../core/theme/app_colors.dart'; // ✅ Importa AppColors
 
-/// Define el tipo de navegación utilizado, aunque no se usa directamente en esta clase.
 enum NavigationType { bottom, rail }
 
-/// Pantalla principal y contenedora de la aplicación.
-///
-/// Gestiona la navegación adaptativa entre las diferentes secciones (Radio, Noticias, Nosotros)
-/// utilizando un BottomNavigationBar para móvil/portrait y un NavigationRail para tablet/desktop/automotive.
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -18,34 +14,21 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-/// Estado y lógica de la pantalla principal.
 class _MainScreenState extends State<MainScreen> {
-  /// Índice de la pestaña actualmente seleccionada.
   int _currentIndex = 0;
-
-  /// Controlador para gestionar la transición entre las páginas de contenido.
   final PageController _pageController = PageController();
-
-  /// Lista de los widgets de las pantallas de contenido (Radio, Noticias, Nosotros).
   late List<Widget> _screens;
-
-  /// Lista de elementos de navegación con íconos y etiquetas.
   late List<NavigationItem> _navigationItems;
 
-  /// Instancia de Firebase Analytics para el seguimiento.
   final analytics = FirebaseAnalytics.instance;
 
-  /// {inheritdoc}
   @override
   void initState() {
     super.initState();
-    // Analítica: Registra la vista de la pantalla principal.
     analytics.logScreenView(screenName: 'main', screenClass: 'MainScreen');
 
-    // Inicialización de las pantallas (cada una obtiene el singleton AudioManager)
     _screens = const [NewsScreen(), AboutScreen()];
 
-    // Definición de los elementos de navegación
     _navigationItems = [
       NavigationItem(
         icon: Icons.article_outlined,
@@ -62,25 +45,17 @@ class _MainScreenState extends State<MainScreen> {
     ];
   }
 
-  /// {inheritdoc}
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
   }
 
-  /// Maneja el cambio de página cuando el usuario se desplaza (swipe) en el PageView.
-  void _onPageChanged(int index) {
-    setState(() => _currentIndex = index);
-  }
+  void _onPageChanged(int index) => setState(() => _currentIndex = index);
 
-  /// Maneja la selección de un elemento de navegación (tap en BottomBar o Rail).
   void _onTabTapped(int index) {
     if (_currentIndex == index) return;
-
     setState(() => _currentIndex = index);
-
-    // Animación suave al cambiar de página
     _pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 300),
@@ -88,26 +63,20 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  /// {inheritdoc}
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveHelper(context);
-    // Determina si se debe usar NavigationRail o BottomNavigationBar
     final useNavigationRail = responsive.useNavigationRail;
 
     return Scaffold(
+      backgroundColor: AppColors.background, // ✅ Fondo unificado
       body: Row(
         children: [
-          // Muestra el NavigationRail en formatos de pantalla anchos (tablet, desktop, automotive)
           if (useNavigationRail) _buildNavigationRail(responsive),
-
-          // Contenido principal (Page View)
           Expanded(
             child: PageView(
               controller: _pageController,
               onPageChanged: _onPageChanged,
-              // Deshabilita el desplazamiento horizontal en entornos automotrices
-              // para evitar cambios accidentales de pantalla al conductor.
               physics: responsive.isAutomotive
                   ? const NeverScrollableScrollPhysics()
                   : const AlwaysScrollableScrollPhysics(),
@@ -116,15 +85,15 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-
-      // Muestra el BottomNavigationBar solo en dispositivos móviles y tablets en vertical
       bottomNavigationBar: useNavigationRail
           ? null
           : _buildBottomNavigationBar(responsive),
     );
   }
 
-  /// Construye el widget NavigationRail, adaptando su tamaño y estilo al dispositivo.
+  /// -------------------------------------------
+  /// NAVIGATION RAIL (Tablet / Desktop)
+  /// -------------------------------------------
   Widget _buildNavigationRail(ResponsiveHelper responsive) {
     final railWidth = responsive.getValue(
       phone: 72.0,
@@ -149,7 +118,6 @@ class _MainScreenState extends State<MainScreen> {
       automotive: 16.0,
     );
 
-    // Se extiende (muestra etiquetas) en automotive, tablets grandes y desktop
     final isExtended =
         responsive.isAutomotive ||
         responsive.isLargeTablet ||
@@ -157,14 +125,13 @@ class _MainScreenState extends State<MainScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: AppColors.surface, // ✅ Usa el color de superficie
         border: Border(
           right: BorderSide(
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+            color: AppColors.textSecondary.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
-        // Sombra sutil para el diseño Automotive
         boxShadow: responsive.isAutomotive
             ? [
                 BoxShadow(
@@ -185,31 +152,29 @@ class _MainScreenState extends State<MainScreen> {
           tablet: 80.0,
           automotive: 90.0,
         ),
-        // En `extended: false`, se fuerza a no mostrar la etiqueta.
         labelType: isExtended ? null : NavigationRailLabelType.none,
         backgroundColor: Colors.transparent,
-        indicatorColor: Theme.of(context).colorScheme.primaryContainer,
+        indicatorColor: AppColors.primary.withValues(alpha: 0.15),
         selectedIconTheme: IconThemeData(
           size: iconSize,
-          color: Theme.of(context).colorScheme.primary,
+          color: AppColors.primary, // ✅ Color principal marca
         ),
         unselectedIconTheme: IconThemeData(
           size: iconSize * 0.9,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          color: AppColors.textSecondary, // ✅ Color texto secundario
         ),
         selectedLabelTextStyle: TextStyle(
           fontSize: labelTextSize,
           fontWeight: FontWeight.w600,
-          color: Theme.of(context).colorScheme.primary,
+          color: AppColors.primary,
         ),
         unselectedLabelTextStyle: TextStyle(
           fontSize: labelTextSize * 0.9,
           fontWeight: FontWeight.normal,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          color: AppColors.textSecondary,
         ),
         destinations: _navigationItems.map((item) {
           return NavigationRailDestination(
-            // El Tooltip es útil para NavigationRail cuando no está extendido
             icon: Tooltip(message: item.tooltip, child: Icon(item.icon)),
             selectedIcon: Tooltip(
               message: item.tooltip,
@@ -229,7 +194,9 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  /// Construye el widget BottomNavigationBar, adaptando su tamaño y estilo al dispositivo móvil.
+  /// -------------------------------------------
+  /// BOTTOM NAVIGATION BAR (Móvil / Vertical)
+  /// -------------------------------------------
   Widget _buildBottomNavigationBar(ResponsiveHelper responsive) {
     final iconSize = responsive.getValue(
       smallPhone: 22.0,
@@ -254,19 +221,20 @@ class _MainScreenState extends State<MainScreen> {
       enableFeedback: true,
       elevation: elevation,
       iconSize: iconSize,
-      selectedFontSize: fontSize,
-      unselectedFontSize: fontSize * 0.85,
-      selectedItemColor: Theme.of(context).colorScheme.primary,
-      unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
+      backgroundColor: AppColors.surface, // ✅ usa surface
+      selectedItemColor: AppColors.primary,
+      unselectedItemColor: AppColors.textSecondary,
       selectedIconTheme: IconThemeData(size: iconSize),
       unselectedIconTheme: IconThemeData(size: iconSize * 0.9),
       selectedLabelStyle: TextStyle(
         fontWeight: FontWeight.w600,
         fontSize: fontSize,
+        color: AppColors.primary,
       ),
       unselectedLabelStyle: TextStyle(
         fontWeight: FontWeight.normal,
         fontSize: fontSize * 0.85,
+        color: AppColors.textSecondary,
       ),
       items: _navigationItems.map((item) {
         return BottomNavigationBarItem(
@@ -297,7 +265,6 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
           label: item.label,
-          // El tooltip se mueve al widget Icon/Padding para mejor accesibilidad y visualización
           tooltip: '',
         );
       }).toList(),
@@ -305,21 +272,12 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-/// Modelo de datos simple para almacenar la información de cada elemento de navegación.
 class NavigationItem {
-  /// Icono por defecto.
   final IconData icon;
-
-  /// Icono cuando el elemento está seleccionado.
   final IconData selectedIcon;
-
-  /// Etiqueta de texto a mostrar.
   final String label;
-
-  /// Texto de tooltip para accesibilidad.
   final String tooltip;
 
-  /// Constructor de NavigationItem.
   NavigationItem({
     required this.icon,
     required this.selectedIcon,
