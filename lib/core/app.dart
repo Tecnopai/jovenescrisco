@@ -4,6 +4,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'theme/app_theme.dart';
 // Importa la pantalla inicial de la aplicación.
 import '../screens/splash_screen.dart';
+import '../utils/navigation_key.dart';
 
 /// {@template jovenescrisco_app}
 /// Widget raíz de la aplicación Ambiente Stereo 88.4 FM.
@@ -73,6 +74,8 @@ class _JovenescriscoAppState extends State<JovenescriscoApp>
       theme: AppTheme.darkTheme,
       // Desactiva la etiqueta de "DEBUG" en la esquina superior derecha.
       debugShowCheckedModeBanner: false,
+      // Asigna la clave del navegador global para acceso desde otras partes de la app.
+      navigatorKey: navigatorKey,
       // Asigna el observador de Firebase Analytics al navegador de la aplicación.
       navigatorObservers: [observer],
       // La pantalla de inicio de la aplicación es la SplashScreen.

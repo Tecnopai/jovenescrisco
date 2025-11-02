@@ -3,7 +3,8 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'news_screen.dart';
 import 'about_screen.dart';
 import '../utils/responsive_helper.dart';
-import '../core/theme/app_colors.dart'; // ✅ Importa AppColors
+import '../core/theme/app_colors.dart';
+import '../utils/version_checker.dart';
 
 enum NavigationType { bottom, rail }
 
@@ -25,6 +26,14 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    // Verificar versión después de que la pantalla esté lista
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (mounted) {
+          VersionChecker.checkVersion();
+        }
+      });
+    });
     analytics.logScreenView(screenName: 'main', screenClass: 'MainScreen');
 
     _screens = const [NewsScreen(), AboutScreen()];
