@@ -19,7 +19,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.miltonbass.jovenescrisco"
     compileSdk = 36
-    ndkVersion = "27.2.12479018"
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -108,3 +108,4 @@ dependencies {
     implementation("androidx.activity:activity:1.9.3")
     implementation("androidx.core:core-ktx:1.15.0")
 }
+
